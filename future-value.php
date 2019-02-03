@@ -1,8 +1,6 @@
 <?php
 
-function rounding($val) {
-	return number_format((float) $val, 2, '.', '');
-}
+include "common.php";
 
 $currentYear = date("Y");
 $currentAge = isset($_POST["current-age"]) ? $_POST["current-age"] : 30;
