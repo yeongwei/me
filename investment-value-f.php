@@ -1,26 +1,22 @@
 <?php
-/**
- * 
- * @param mixed $initialAmount 
- * @param mixed $years years of investment run
- * @param mixed $interest average interest per year
- * @param mixed $reoucurringAmount
- * @return  
- */
-function computeInvestmentValue($initialAmount, $years, $interest, $reoucurringAmount) {
+
+function epf($startAmount, $startAge, $startYear, $yearsToGo, $interestPerYear, $startRecuringAmount, $recuringAmountIncrement) {
 	$iv = array();
-	$data = array("year" => "", "value" => "");
-	$year = date("Y");
-	$interest = $interest / 100.00;
+	$data = array("age" => "", "year" => "", "value" => "", "recur" => "");
+	$interestPerYear = $interestPerYear / 100.00;
+	$recuringAmountIncrement = $recuringAmountIncrement / 100.00;
 	
-	for ($i = 0; $i < $years; $i++) {
-		$data["year"] = $year + $i;
+	for ($i = 0; $i < $yearsToGo; $i++) {
+		$data["year"] = $startYear + $i;
+		$data["age"] = $startAge + $i;
 
 		if ($i == 0) {
+			$data["recur"] = $startRecuringAmount;
 			$data["value"] = 
-				($initialAmount + $reoucurringAmount) * (1 + $interest);
+				($startAmount + $data["recur"]) * (1 + $interest);
 		} else {
-			$data["value"] = ($iv[$i-1]["value"] + $reoucurringAmount) * (1 + $interest);
+			$data["recur"] = $iv[$i-1]["recur"] * (1 + $recuringAmountIncrement); 
+			$data["value"] = ($iv[$i-1]["value"] + $data["recur"]) * (1 + $interest);
 		}
 
 		array_push($iv, $data);
@@ -31,19 +27,15 @@ function computeInvestmentValue($initialAmount, $years, $interest, $reoucurringA
 
 include "common.php";
 
-$currentAge = date("Y") - 1988;
-$retirementAge = 60; // Start to retire at the age of 60
-$yearsOfRetirement = 20; // Years in retirement
+$epf = epf(
+	$startAmount = 120000, 
+	$startAge = $startAge, 
+	$startYear = $startYear,
+	$yearsToGo = $retirementAge - $startAge + 1,
+	$interestPerYear = 4.60, 
+	$startRecuringAmount = 1900.00 * 12, 
+	$recuringAmountIncrement = 5.00);
 
-$iv = computeInvestmentValue(150000, 30, 5.00, 2000.00 * 12);
-
-// Append age to investment value
-foreach ($iv as $i => $v)
-	if ($i == 0)
-		$iv[$i]["age"] = $currentAge;
-	else
-		$iv[$i]["age"] = $iv[$i - 1]["age"] + 1;
-
-dataDump($iv);
+dataDump($epf);
 
 ?>
